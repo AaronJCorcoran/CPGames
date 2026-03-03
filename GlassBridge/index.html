@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glass Bridge Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cedar's Glass Bridge</title>
     <style>
         * {
             margin: 0;
@@ -20,6 +20,8 @@
             align-items: center;
             padding: 20px;
             color: white;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .game-container {
@@ -138,6 +140,8 @@
             align-items: center;
             justify-content: center;
             font-size: 1.5em;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .tile:hover:not(.disabled):not(.correct):not(.wrong) {
@@ -537,7 +541,7 @@
     </div>
 
     <div class="header">
-        <h1>🌉 Glass Bridge Challenge 🌉</h1>
+        <h1>🌉 Cedar's Glass Bridge 🌉</h1>
     </div>
 
     <div class="game-container">
@@ -565,7 +569,7 @@
 
             <div class="message" id="message">Choose Left or Right to cross the bridge!</div>
 
-            <div class="controls-hint" style="text-align: center;">💡 Use ⬅️ LEFT or ➡️ RIGHT arrow keys, or click with mouse</div>
+            <div class="controls-hint" style="text-align: center;">💡 Tap a tile to choose, or use ⬅️ ➡️ arrow keys</div>
         </div>
 
         <div class="bridge-panel">

@@ -1439,3 +1439,87 @@ function nextLevelOrRestart() {
 loadLevel(1);
 updateUI();
 gameLoop();
+
+// Touch Controls
+(function setupTouchControls() {
+    const touchJumpBtn = document.getElementById('touch-jump-btn');
+    const joystickBase = document.getElementById('joystick-base');
+    const joystickKnob = document.getElementById('joystick-knob');
+    const touchShopBtn = document.getElementById('touch-shop-btn');
+    const touchRestartBtn = document.getElementById('touch-restart-btn');
+
+    // Jump button
+    touchJumpBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys[' '] = true;
+        keys['Space'] = true;
+        touchJumpBtn.classList.add('pressed');
+    }, { passive: false });
+
+    touchJumpBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys[' '] = false;
+        keys['Space'] = false;
+        touchJumpBtn.classList.remove('pressed');
+    }, { passive: false });
+
+    touchJumpBtn.addEventListener('touchcancel', () => {
+        keys[' '] = false;
+        keys['Space'] = false;
+        touchJumpBtn.classList.remove('pressed');
+    });
+
+    // Joystick
+    let joystickTouchId = null;
+    let joystickCenterX = 0;
+    const maxKnobOffset = 38;
+
+    joystickBase.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (joystickTouchId !== null) return;
+        const touch = e.changedTouches[0];
+        joystickTouchId = touch.identifier;
+        const rect = joystickBase.getBoundingClientRect();
+        joystickCenterX = rect.left + rect.width / 2;
+    }, { passive: false });
+
+    joystickBase.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            const touch = e.changedTouches[i];
+            if (touch.identifier === joystickTouchId) {
+                const dx = touch.clientX - joystickCenterX;
+                keys['ArrowLeft'] = dx < -15;
+                keys['ArrowRight'] = dx > 15;
+                const clampedDx = Math.max(-maxKnobOffset, Math.min(maxKnobOffset, dx));
+                joystickKnob.style.transform = `translate(calc(-50% + ${clampedDx}px), -50%)`;
+                break;
+            }
+        }
+    }, { passive: false });
+
+    function resetJoystick() {
+        keys['ArrowLeft'] = false;
+        keys['ArrowRight'] = false;
+        joystickKnob.style.transform = 'translate(-50%, -50%)';
+        joystickTouchId = null;
+    }
+
+    joystickBase.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === joystickTouchId) {
+                resetJoystick();
+                break;
+            }
+        }
+    }, { passive: false });
+
+    joystickBase.addEventListener('touchcancel', resetJoystick);
+
+    // Shop and Restart buttons
+    touchShopBtn.addEventListener('click', toggleShop);
+    touchRestartBtn.addEventListener('click', restartGame);
+    touchShopBtn.addEventListener('touchstart', (e) => { e.preventDefault(); toggleShop(); }, { passive: false });
+    touchRestartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); restartGame(); }, { passive: false });
+})();

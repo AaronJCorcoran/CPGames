@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obstacle Course - Parkour Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Phoenix's Parkour</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
         <div class="header">
-            <h1>🏃 OBSTACLE COURSE 🏃</h1>
+            <h1>🏃 Phoenix's Parkour 🏃</h1>
             <div class="stats">
                 <div class="stat">🎯 Level: <span id="currentLevel">1</span>/<span id="totalLevels">10</span></div>
                 <div class="stat">💰 Coins: <span id="coins">0</span></div>
@@ -25,8 +25,8 @@
         
         <div class="controls">
             <div class="control-info">
-                <p>⬅️ ➡️ Arrow Keys to Move | ⬆️ Space to Jump</p>
-                <p>Press 'S' to open Shop | Press 'R' to Restart</p>
+                <p>⬅️ ➡️ Arrow Keys or on-screen Joystick to Move | ⬆️ Space or JUMP button</p>
+                <p>Press 'S' or tap Shop button | Press 'R' or tap Restart button</p>
             </div>
         </div>
         
@@ -79,6 +79,26 @@
         </div>
     </div>
     
+    <!-- Touch Controls (tablet/touch screen) -->
+    <div class="touch-controls" id="touch-controls">
+        <button class="touch-jump-btn" id="touch-jump-btn">
+            <span>🆙</span>
+            <span class="touch-btn-label">JUMP</span>
+        </button>
+        <div class="touch-center-btns">
+            <button class="touch-small-btn" id="touch-shop-btn">🛒 Shop</button>
+            <button class="touch-small-btn" id="touch-restart-btn">🔄 Restart</button>
+        </div>
+        <div class="touch-joystick-container">
+            <div class="joystick-base" id="joystick-base">
+                <div class="joystick-knob" id="joystick-knob"></div>
+                <div class="joystick-arrow joystick-arrow-left">◀</div>
+                <div class="joystick-arrow joystick-arrow-right">▶</div>
+            </div>
+            <div class="joystick-label">MOVE</div>
+        </div>
+    </div>
+
     <script src="game.js"></script>
 </body>
 </html>
