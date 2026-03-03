@@ -116,54 +116,16 @@ body {
     flex-shrink: 0;
 }
 
-.shop-scroll-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 10px;
-    flex-shrink: 0;
-}
-
-.shop-scroll-btn {
-    background: rgba(102, 126, 234, 0.85);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    font-size: 1.4em;
-    cursor: pointer;
-    flex-shrink: 0;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-    transition: background 0.15s, transform 0.1s;
-}
-
-.shop-scroll-btn:active {
-    background: #764ba2;
-    transform: scale(0.92);
-}
-
-.shop-swipe-hint {
-    font-size: 0.85em;
-    color: #888;
-    padding: 6px 0 4px;
-    flex-shrink: 0;
-}
-
 .shop-items {
     display: flex;
     flex-direction: row;
     gap: 16px;
-    justify-content: flex-start;
-    padding: 10px 24px 10px;
+    padding: 14px 20px 18px;
     overflow-x: auto;
     overflow-y: hidden;
     flex: 1;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
 }
 
 .shop-item {
@@ -171,9 +133,8 @@ body {
     color: white;
     padding: 18px;
     border-radius: 15px;
-    min-width: 190px;
-    max-width: 210px;
-    flex: 0 0 190px;
+    min-width: 200px;
+    flex: 0 0 200px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
     scroll-snap-align: start;
