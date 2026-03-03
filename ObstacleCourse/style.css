@@ -9,9 +9,10 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
     padding: 20px;
+    overflow-x: hidden;
 }
 
 .game-container {
@@ -19,7 +20,9 @@ body {
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     padding: 20px;
+    padding-bottom: 180px;
     max-width: 1240px;
+    width: 100%;
 }
 
 .header {
@@ -102,9 +105,10 @@ body {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     width: 95vw;
     max-width: 1100px;
-    max-height: 90vh;
+    max-height: 85vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     text-align: center;
 }
 
@@ -118,14 +122,15 @@ body {
 .shop-items {
     display: flex;
     flex-direction: row;
+    flex-wrap: nowrap;
     gap: 16px;
-    padding: 14px 20px 18px;
-    overflow-x: auto;
-    overflow-y: visible;
-    height: 280px;
+    padding: 14px 20px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    min-height: 0;
+    flex: 1 1 0;
     -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    flex-shrink: 0;
+    overscroll-behavior-x: contain;
 }
 
 .shop-item {
