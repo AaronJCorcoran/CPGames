@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obstacle Course - Parkour Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🏃 OBSTACLE COURSE 🏃</h1>
+            <div class="stats">
+                <div class="stat">🎯 Level: <span id="currentLevel">1</span>/<span id="totalLevels">10</span></div>
+                <div class="stat">💰 Coins: <span id="coins">0</span></div>
+                <div class="stat">⚡ Jump Coils: <span id="jumpCoils">0</span></div>
+                <div class="stat">🚀 Speed Coils: <span id="speedCoils">0</span></div>
+                <div class="stat">💎 Double Jumps: <span id="doubleJumps">0</span></div>
+                <div class="stat">🧲 Magnets: <span id="magnets">0</span></div>
+                <div class="stat">🛡️ Shields: <span id="shields">0</span></div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="1200" height="600"></canvas>
+        
+        <div class="controls">
+            <div class="control-info">
+                <p>⬅️ ➡️ Arrow Keys to Move | ⬆️ Space to Jump</p>
+                <p>Press 'S' to open Shop | Press 'R' to Restart</p>
+            </div>
+        </div>
+        
+        <div id="shop" class="shop-overlay hidden">
+            <div class="shop-content">
+                <h2>🛒 SHOP</h2>
+                <div class="shop-items">
+                    <div class="shop-item">
+                        <h3>⚡ Jump Coil</h3>
+                        <p>Jump higher and longer!</p>
+                        <p class="price">💰 $600</p>
+                        <button id="buyJumpCoil">Buy Jump Coil</button>
+                    </div>
+                    <div class="shop-item">
+                        <h3>🚀 Speed Coil</h3>
+                        <p>Move faster across obstacles!</p>
+                        <p class="price">💰 $700</p>
+                        <button id="buySpeedCoil">Buy Speed Coil</button>
+                    </div>
+                    <div class="shop-item">
+                        <h3>💎 Double Jump</h3>
+                        <p>Jump a second time in mid-air!</p>
+                        <p class="price">💰 $1000</p>
+                        <button id="buyDoubleJump">Buy Double Jump</button>
+                    </div>
+                    <div class="shop-item">
+                        <h3>🧲 Coin Magnet</h3>
+                        <p>Collect coins from farther away!</p>
+                        <p class="price">💰 $800</p>
+                        <button id="buyMagnet">Buy Coin Magnet</button>
+                    </div>
+                    <div class="shop-item">
+                        <h3>🛡️ Shield</h3>
+                        <p>Survive one fall without respawning!</p>
+                        <p class="price">💰 $1200</p>
+                        <button id="buyShield">Buy Shield</button>
+                    </div>
+                </div>
+                <button id="closeShop" class="close-btn">Close Shop (Press S)</button>
+            </div>
+        </div>
+        
+        <div id="gameOver" class="game-over-overlay hidden">
+            <div class="game-over-content">
+                <h2 id="gameOverTitle">🎉 LEVEL COMPLETE! 🎉</h2>
+                <p id="gameOverMessage">Congratulations! You made it through the obstacle course!</p>
+                <p class="final-coins">Coins Collected: <span id="finalCoins">0</span></p>
+                <button id="playAgain">Next Level ➡️</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
