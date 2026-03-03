@@ -116,6 +116,42 @@ body {
     flex-shrink: 0;
 }
 
+.shop-scroll-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    flex-shrink: 0;
+}
+
+.shop-scroll-btn {
+    background: rgba(102, 126, 234, 0.85);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.4em;
+    cursor: pointer;
+    flex-shrink: 0;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    transition: background 0.15s, transform 0.1s;
+}
+
+.shop-scroll-btn:active {
+    background: #764ba2;
+    transform: scale(0.92);
+}
+
+.shop-swipe-hint {
+    font-size: 0.85em;
+    color: #888;
+    padding: 6px 0 4px;
+    flex-shrink: 0;
+}
+
 .shop-items {
     display: flex;
     flex-direction: row;

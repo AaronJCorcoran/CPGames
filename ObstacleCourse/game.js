@@ -977,6 +977,14 @@ document.getElementById('buyShield').addEventListener('click', () => buyItem('sh
 document.getElementById('closeShop').addEventListener('click', toggleShop);
 document.getElementById('playAgain').addEventListener('click', nextLevelOrRestart);
 
+// Shop scroll arrows
+document.getElementById('shopScrollLeft').addEventListener('click', () => {
+    document.getElementById('shopItemsRow').scrollBy({ left: -210, behavior: 'smooth' });
+});
+document.getElementById('shopScrollRight').addEventListener('click', () => {
+    document.getElementById('shopItemsRow').scrollBy({ left: 210, behavior: 'smooth' });
+});
+
 // Game Functions
 function loadLevel(levelNum) {
     const level = levels[levelNum];

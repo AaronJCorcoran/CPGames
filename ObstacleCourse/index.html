@@ -33,10 +33,12 @@
         <div id="shop" class="shop-overlay hidden">
             <div class="shop-content">
                 <h2>🛒 SHOP</h2>
-                <div class="shop-items">
-                    <div class="shop-item">
-                        <h3>⚡ Jump Coil</h3>
-                        <p>Jump higher and longer!</p>
+                <div class="shop-scroll-wrapper">
+                    <button class="shop-scroll-btn shop-scroll-left" id="shopScrollLeft">❮</button>
+                    <div class="shop-items" id="shopItemsRow">
+                        <div class="shop-item">
+                            <h3>⚡ Jump Coil</h3>
+                            <p>Jump higher and longer!</p>
                         <p class="price">💰 $600</p>
                         <button id="buyJumpCoil">Buy Jump Coil</button>
                     </div>
@@ -64,7 +66,10 @@
                         <p class="price">💰 $1200</p>
                         <button id="buyShield">Buy Shield</button>
                     </div>
+                    </div>
+                    <button class="shop-scroll-btn shop-scroll-right" id="shopScrollRight">❯</button>
                 </div>
+                <p class="shop-swipe-hint">← Swipe or tap arrows to see all items →</p>
                 <button id="closeShop" class="close-btn">Close Shop (Press S)</button>
             </div>
         </div>
