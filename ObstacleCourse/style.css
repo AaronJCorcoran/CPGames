@@ -127,10 +127,10 @@ body {
     padding: 14px 20px;
     overflow-x: scroll;
     overflow-y: hidden;
-    min-height: 0;
-    flex: 1 1 0;
+    min-height: 260px;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
+    align-items: stretch;
 }
 
 .shop-item {
