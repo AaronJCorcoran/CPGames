@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pet.io</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <h1>🐾 Pet.io</h1>
+            <div id="money-display">💰 $0</div>
+        </header>
+
+        <div id="pads-container">
+            <div class="pad" data-pad="0">
+                <div class="pad-multiplier">1x</div>
+                <div class="pad-lane lane-1">
+                    <div class="conveyor"></div>
+                </div>
+                <div class="collector">📥</div>
+            </div>
+            <div class="pad" data-pad="1">
+                <div class="pad-multiplier" id="mult-1">1x</div>
+                <div class="pad-lane lane-2">
+                    <div class="conveyor"></div>
+                </div>
+                <div class="collector">📥</div>
+            </div>
+            <div class="pad" data-pad="2">
+                <div class="pad-multiplier" id="mult-2">1x</div>
+                <div class="pad-lane lane-3">
+                    <div class="conveyor"></div>
+                </div>
+                <div class="collector">📥</div>
+            </div>
+            <div class="pad" data-pad="3">
+                <div class="pad-multiplier" id="mult-3">1x</div>
+                <div class="pad-lane lane-4">
+                    <div class="conveyor"></div>
+                </div>
+                <div class="collector">📥</div>
+            </div>
+            <div class="pad" data-pad="4">
+                <div class="pad-multiplier">1x</div>
+                <div class="pad-lane lane-5">
+                    <div class="conveyor"></div>
+                </div>
+                <div class="collector">📥</div>
+            </div>
+        </div>
+
+        <div id="shop">
+            <h2>🛒 Shop</h2>
+            <div id="shop-buttons">
+                <button id="luck-btn" class="shop-btn">
+                    <span class="btn-icon">🍀</span>
+                    <span class="btn-label">Luck Lv.0</span>
+                    <span class="btn-cost">$1,000</span>
+                </button>
+                <button id="pad2-btn" class="shop-btn multiplier-btn">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-label">Pad 2 → 2x</span>
+                    <span class="btn-cost">$5,000</span>
+                </button>
+                <button id="pad3-btn" class="shop-btn multiplier-btn">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-label">Pad 3 → 2x</span>
+                    <span class="btn-cost">$50,000</span>
+                </button>
+                <button id="pad4-btn" class="shop-btn multiplier-btn">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-label">Pad 4 → 2x</span>
+                    <span class="btn-cost">$500,000</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="collection">
+            <h2>📋 Collection <span id="discovered-count">0</span>/32</h2>
+            <div id="pet-grid"></div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

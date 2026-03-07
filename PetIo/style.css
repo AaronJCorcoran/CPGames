@@ -1,0 +1,388 @@
+/* ========================
+   PET.IO - style.css
+   ======================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #1a1a2e;
+    color: #ecf0f1;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+#game-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 12px 30px;
+}
+
+/* ---- HEADER ---- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0 14px;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #f1c40f, #e67e22, #e74c3c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#money-display {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #2ecc71;
+    background: rgba(46, 204, 113, 0.1);
+    border: 2px solid rgba(46, 204, 113, 0.3);
+    border-radius: 12px;
+    padding: 6px 16px;
+    transition: transform 0.15s;
+}
+
+#money-display.pulse {
+    transform: scale(1.08);
+}
+
+/* ---- PADS ---- */
+#pads-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.pad {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pad-multiplier {
+    width: 36px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #95a5a6;
+    flex-shrink: 0;
+}
+
+.pad-multiplier.active {
+    color: #f1c40f;
+    text-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+}
+
+.pad-lane {
+    flex: 1;
+    height: 56px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.lane-1 { background: linear-gradient(90deg, #1e3a2f, #2d5a42); }
+.lane-2 { background: linear-gradient(90deg, #1e2e3a, #2d4a5a); }
+.lane-3 { background: linear-gradient(90deg, #2e1e3a, #4a2d5a); }
+.lane-4 { background: linear-gradient(90deg, #3a2e1e, #5a4a2d); }
+.lane-5 { background: linear-gradient(90deg, #3a1e2e, #5a2d4a); }
+
+/* Conveyor belt lines */
+.conveyor {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 28px,
+        rgba(255, 255, 255, 0.04) 28px,
+        rgba(255, 255, 255, 0.04) 30px
+    );
+    animation: conveyorMove 2s linear infinite;
+}
+
+@keyframes conveyorMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(30px); }
+}
+
+/* Center line in lane */
+.pad-lane::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-50%);
+}
+
+.collector {
+    width: 40px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: rgba(46, 204, 113, 0.15);
+    border: 2px solid rgba(46, 204, 113, 0.3);
+    border-radius: 8px;
+    flex-shrink: 0;
+    animation: collectorGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes collectorGlow {
+    from { box-shadow: 0 0 4px rgba(46, 204, 113, 0.2); }
+    to { box-shadow: 0 0 14px rgba(46, 204, 113, 0.5); }
+}
+
+/* ---- PETS ON LANE ---- */
+.pet {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    transition: left 0.05s linear;
+    pointer-events: none;
+}
+
+.pet .pet-emoji {
+    display: inline-block;
+    animation: petBob 0.6s ease-in-out infinite;
+}
+
+@keyframes petBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* Rarity glow effects */
+.pet.common .pet-emoji { filter: none; }
+.pet.uncommon .pet-emoji { filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0.6)); }
+.pet.rare .pet-emoji { filter: drop-shadow(0 0 6px rgba(192, 132, 252, 0.7)); }
+.pet.epic .pet-emoji { filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.8)); }
+.pet.legendary .pet-emoji { filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.9)); }
+.pet.mythic .pet-emoji {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 1));
+    animation: petBob 0.6s ease-in-out infinite, mythicShimmer 1s linear infinite;
+}
+
+@keyframes mythicShimmer {
+    0% { filter: drop-shadow(0 0 12px #f1c40f); }
+    33% { filter: drop-shadow(0 0 12px #e74c3c); }
+    66% { filter: drop-shadow(0 0 12px #9b59b6); }
+    100% { filter: drop-shadow(0 0 12px #f1c40f); }
+}
+
+/* ---- MONEY POPUP ---- */
+.money-pop {
+    position: absolute;
+    right: -10px;
+    top: 0;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #2ecc71;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    animation: moneyFloat 1.2s ease-out forwards;
+}
+
+@keyframes moneyFloat {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-45px) scale(1.2); }
+}
+
+/* ---- COLLECTION ANIMATION ---- */
+.pet.collecting {
+    transition: all 0.3s ease-in;
+    opacity: 0;
+    transform: translateY(-50%) scale(0.3);
+}
+
+/* ---- SHOP ---- */
+#shop {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 18px;
+}
+
+#shop h2 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #bdc3c7;
+}
+
+#shop-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.shop-btn {
+    flex: 1 1 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 8px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #ecf0f1;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.shop-btn:active {
+    transform: scale(0.95);
+}
+
+.shop-btn:not(.disabled):hover {
+    border-color: rgba(46, 204, 113, 0.5);
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.shop-btn.disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.shop-btn.purchased {
+    border-color: rgba(241, 196, 15, 0.4);
+    background: rgba(241, 196, 15, 0.08);
+    opacity: 0.6;
+}
+
+.btn-icon {
+    font-size: 1.4rem;
+}
+
+.btn-label {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.btn-cost {
+    font-size: 0.75rem;
+    color: #2ecc71;
+}
+
+.shop-btn.purchased .btn-cost {
+    color: #f1c40f;
+}
+
+/* ---- COLLECTION ---- */
+#collection {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+#collection h2 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #bdc3c7;
+}
+
+#discovered-count {
+    color: #2ecc71;
+}
+
+#pet-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+}
+
+.pet-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.2);
+    position: relative;
+    cursor: default;
+}
+
+.pet-cell.discovered {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.pet-cell.undiscovered {
+    color: #555;
+    font-size: 1.2rem;
+}
+
+/* Rarity borders for collection */
+.pet-cell.rarity-common { border-color: rgba(74, 222, 128, 0.4); }
+.pet-cell.rarity-uncommon { border-color: rgba(96, 165, 250, 0.5); }
+.pet-cell.rarity-rare { border-color: rgba(192, 132, 252, 0.5); }
+.pet-cell.rarity-epic { border-color: rgba(251, 146, 60, 0.6); }
+.pet-cell.rarity-legendary { border-color: rgba(248, 113, 113, 0.7); }
+.pet-cell.rarity-mythic {
+    border-image: linear-gradient(135deg, #f1c40f, #e74c3c, #9b59b6, #3498db, #2ecc71) 1;
+}
+
+/* Tooltip on tap */
+.pet-cell .pet-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2c3e50;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    z-index: 20;
+    pointer-events: none;
+    color: #ecf0f1;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.pet-cell.show-tooltip .pet-tooltip {
+    display: block;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 600px) {
+    header h1 { font-size: 1.4rem; }
+    #money-display { font-size: 1.1rem; padding: 4px 12px; }
+    .pad-lane { height: 48px; }
+    .pet { font-size: 1.6rem; }
+    .collector { width: 34px; height: 48px; font-size: 1.2rem; }
+    #pet-grid { grid-template-columns: repeat(8, 1fr); gap: 4px; }
+    .pet-cell { font-size: 1.2rem; }
+    .shop-btn { flex: 1 1 120px; padding: 8px 6px; }
+}
+
+@media (max-width: 400px) {
+    #pet-grid { grid-template-columns: repeat(6, 1fr); }
+}
