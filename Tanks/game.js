@@ -469,10 +469,8 @@ function updatePlayerInput() {
         tank.vy *= 0.7;
     }
 
-    // Attack
-    if (attackPressed || keys[' '] || keys['Space']) {
-        playerAttack(tank);
-    }
+    // Auto-attack always
+    playerAttack(tank);
 }
 
 function playerAttack(tank) {
@@ -507,6 +505,55 @@ function playerAttack(tank) {
         const by = tank.centerY + Math.sin(angle) * 35;
         bullets.push(new Bullet(bx, by, angle, 'player', tank.attackDamage));
         tank.lastAttackTime = Date.now();
+    }
+}
+
+// ---- ALLY AI (unselected player tank auto-fights) ----
+function updateAllyAI(dt) {
+    const pt = getPlayerTanks();
+    const enemies = getEnemyTanks().filter(e => e.alive);
+    for (const tank of pt) {
+        if (!tank.alive || tank.selected || enemies.length === 0) continue;
+        // Find closest enemy
+        let target = enemies[0];
+        let targetDist = tank.distanceTo(enemies[0]);
+        for (let i = 1; i < enemies.length; i++) {
+            const d = tank.distanceTo(enemies[i]);
+            if (d < targetDist) { targetDist = d; target = enemies[i]; }
+        }
+        const angle = tank.angleTo(target);
+        if (tank.type === 'sawblade') {
+            // Rush toward enemy
+            tank.vx = Math.cos(angle) * tank.speed;
+            tank.vy = Math.sin(angle) * tank.speed;
+            tank.angle = angle;
+            if (targetDist <= tank.attackRange + target.width / 2 && tank.canAttack()) {
+                target.takeDamage(tank.attackDamage);
+                spawnSawSparks(target.centerX, target.centerY);
+                tank.lastAttackTime = Date.now();
+            }
+        } else {
+            // Keep distance and shoot
+            const idealDist = 220;
+            if (targetDist < idealDist - 40) {
+                tank.vx = -Math.cos(angle) * tank.speed;
+                tank.vy = -Math.sin(angle) * tank.speed;
+            } else if (targetDist > idealDist + 60) {
+                tank.vx = Math.cos(angle) * tank.speed * 0.8;
+                tank.vy = Math.sin(angle) * tank.speed * 0.8;
+            } else {
+                tank.vx *= 0.85;
+                tank.vy *= 0.85;
+            }
+            tank.turretAngle = angle;
+            tank.angle = angle;
+            if (tank.canAttack() && targetDist <= tank.attackRange) {
+                const bx = tank.centerX + Math.cos(angle) * 35;
+                const by = tank.centerY + Math.sin(angle) * 35;
+                bullets.push(new Bullet(bx, by, angle, 'player', tank.attackDamage));
+                tank.lastAttackTime = Date.now();
+            }
+        }
     }
 }
 
@@ -734,6 +781,7 @@ function gameLoop(timestamp) {
     if (gameState.running) {
         // Input
         updatePlayerInput();
+        updateAllyAI(dt);
         updateAI(dt);
 
         // Update tanks
