@@ -62,7 +62,8 @@ let activePets = [];  // { petIndex, padIndex, progress, element }
 let totalCollected = 0;
 
 // ---- CONSTANTS ----
-const SPAWN_INTERVAL = 3000;  // ms between spawns
+const SPAWN_MIN = 400;        // fastest spawn gap (ms)
+const SPAWN_MAX = 6000;       // slowest spawn gap (ms)
 const CROSS_TIME = 6000;      // ms to cross a lane
 const BASE_RATE = 0.72;       // probability falloff per tier
 const LUCK_BONUS = 0.006;     // rate increase per luck level
@@ -322,15 +323,22 @@ function updateShop() {
 // ---- GAME LOOP ----
 let lastTime = performance.now();
 let spawnTimer = 0;
+let nextSpawnAt = randomSpawnDelay();
+
+function randomSpawnDelay() {
+    // Weighted random: sometimes quick bursts, sometimes long waits
+    return SPAWN_MIN + Math.random() * Math.random() * (SPAWN_MAX - SPAWN_MIN);
+}
 
 function gameLoop(timestamp) {
     const dt = timestamp - lastTime;
     lastTime = timestamp;
 
-    // Spawn timer
+    // Spawn timer with random intervals
     spawnTimer += dt;
-    if (spawnTimer >= SPAWN_INTERVAL) {
-        spawnTimer -= SPAWN_INTERVAL;
+    if (spawnTimer >= nextSpawnAt) {
+        spawnTimer = 0;
+        nextSpawnAt = randomSpawnDelay();
         spawnPet();
     }
 
