@@ -15,47 +15,32 @@
         <div class="hud">
             <div class="team-hud team-player">
                 <h3>🟦 Your Team</h3>
-                <div class="tank-health">
-                    <span class="tank-icon">🔧</span>
-                    <span class="tank-name">Sawblade</span>
-                    <div class="health-bar"><div class="health-fill player-saw-hp" id="playerSawHp"></div></div>
-                </div>
-                <div class="tank-health">
-                    <span class="tank-icon">💥</span>
-                    <span class="tank-name">Cannon</span>
-                    <div class="health-bar"><div class="health-fill player-cannon-hp" id="playerCannonHp"></div></div>
-                </div>
+                <div id="playerHpBars"></div>
             </div>
             <div class="round-info">
+                <div class="level-label">Level <span id="levelNum">1</span>/5</div>
                 <div class="round-number">Round <span id="roundNum">1</span></div>
                 <div class="score">Score: <span id="score">0</span></div>
             </div>
             <div class="team-hud team-enemy">
                 <h3>🟥 Enemy Team</h3>
-                <div class="tank-health">
-                    <span class="tank-icon">🔧</span>
-                    <span class="tank-name">Sawblade</span>
-                    <div class="health-bar"><div class="health-fill enemy-saw-hp" id="enemySawHp"></div></div>
-                </div>
-                <div class="tank-health">
-                    <span class="tank-icon">💥</span>
-                    <span class="tank-name">Cannon</span>
-                    <div class="health-bar"><div class="health-fill enemy-cannon-hp" id="enemyCannonHp"></div></div>
-                </div>
+                <div id="enemyHpBars"></div>
             </div>
         </div>
+
+        <div id="combine-hint" class="combine-hint hidden">🔀 Your Sawblade + Cannon are close — tap COMBINE!</div>
 
         <canvas id="gameCanvas" width="1200" height="600"></canvas>
 
         <div class="controls-hint">
-            <p>Tap a tank to select it · Joystick to move · 🔴 to attack</p>
+            <p>Move with joystick · Tanks auto-attack · Drive saw+cannon together to COMBINE!</p>
         </div>
     </div>
 
     <!-- Touch Controls -->
     <div class="touch-controls">
         <div class="touch-left">
-            <div class="tank-select-btns">
+            <div class="tank-select-btns" id="tankSelectBtns">
                 <button class="tank-select-btn selected" id="selectSaw">🔧 Sawblade</button>
                 <button class="tank-select-btn" id="selectCannon">💥 Cannon</button>
             </div>
@@ -65,6 +50,8 @@
             <div class="joystick-label">MOVE</div>
         </div>
         <div class="touch-right">
+            <button class="combine-btn hidden" id="combine-btn">🔀</button>
+            <div class="combine-label hidden" id="combine-label">COMBINE</div>
             <button class="attack-btn" id="attack-btn">⚔️</button>
             <div class="attack-label">ATTACK</div>
         </div>
@@ -76,7 +63,8 @@
             <h2 id="gameOverTitle">🏆 VICTORY! 🏆</h2>
             <p id="gameOverMsg">You destroyed the enemy team!</p>
             <p class="final-score">Score: <span id="finalScore">0</span></p>
-            <button id="playAgainBtn" class="play-again-btn">Play Again</button>
+            <button id="nextRoundBtn" class="play-again-btn">▶️ Next Round</button>
+            <button id="playAgainBtn" class="play-again-btn" style="display:none;">Restart</button>
         </div>
     </div>
 

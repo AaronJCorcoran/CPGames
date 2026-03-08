@@ -126,6 +126,54 @@ body {
     color: #ecf0f1;
 }
 
+.level-label {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #2ecc71;
+    margin-bottom: 2px;
+}
+
+.combine-hint {
+    text-align: center;
+    padding: 8px;
+    background: rgba(241, 196, 15, 0.2);
+    border: 2px solid rgba(241, 196, 15, 0.5);
+    border-radius: 10px;
+    color: #f1c40f;
+    font-weight: bold;
+    font-size: 0.95em;
+    margin-bottom: 8px;
+    animation: combineFlash 0.8s ease-in-out infinite alternate;
+}
+
+.combine-hint.hidden { display: none; }
+
+@keyframes combineFlash {
+    from { opacity: 0.7; }
+    to { opacity: 1; }
+}
+
+.combine-btn {
+    width: 70px;
+    height: 70px;
+    background: rgba(241, 196, 15, 0.8);
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    font-size: 1.8em;
+    color: white;
+    cursor: pointer;
+    pointer-events: all;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.1s;
+}
+
+.combine-btn:active { transform: scale(0.9); }
+.combine-btn.hidden { display: none; }
+.combine-label { color: rgba(255, 255, 255, 0.7); font-size: 0.7em; font-weight: bold; letter-spacing: 1px; }
+.combine-label.hidden { display: none; }
+
 /* Canvas */
 #gameCanvas {
     display: block;
@@ -317,6 +365,8 @@ body {
 
 .play-again-btn {
     margin-top: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
     padding: 14px 40px;
     background: #e74c3c;
     color: white;
@@ -332,6 +382,14 @@ body {
 
 .play-again-btn:hover {
     background: #c0392b;
+}
+
+#nextRoundBtn {
+    background: #2ecc71;
+}
+
+#nextRoundBtn:hover {
+    background: #27ae60;
 }
 
 /* Responsive */
