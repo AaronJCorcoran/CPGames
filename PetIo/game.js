@@ -70,7 +70,7 @@ const MAX_LUCK = 30;
 const MAX_PAD_MULT = 10;
 
 // Base costs for each pad's first upgrade (1x→2x). Each subsequent level costs 3x more.
-const PAD_MULT_BASE_COST = [0, 5000, 50000, 500000, 0]; // pads 1,2,3
+const PAD_MULT_BASE_COST = [500, 5000, 50000, 500000, 5000000]; // all 5 pads
 
 function getPadUpgradeCost(padIndex) {
     const currentLevel = padMultipliers[padIndex]; // 1 means no upgrades yet
@@ -83,9 +83,11 @@ const moneyDisplay = document.getElementById('money-display');
 const padLanes = document.querySelectorAll('.pad-lane');
 const collectors = document.querySelectorAll('.collector');
 const luckBtn = document.getElementById('luck-btn');
+const pad1Btn = document.getElementById('pad1-btn');
 const pad2Btn = document.getElementById('pad2-btn');
 const pad3Btn = document.getElementById('pad3-btn');
 const pad4Btn = document.getElementById('pad4-btn');
+const pad5Btn = document.getElementById('pad5-btn');
 const petGrid = document.getElementById('pet-grid');
 const discoveredCountEl = document.getElementById('discovered-count');
 
@@ -219,7 +221,7 @@ function buyPadMultiplier(padIndex) {
     money -= cost;
     padMultipliers[padIndex]++;
 
-    // Update pad label
+    // Update pad label next to lane
     const label = document.getElementById('mult-' + padIndex);
     if (label) {
         label.textContent = padMultipliers[padIndex] + 'x';
@@ -298,8 +300,8 @@ function updateShop() {
     }
 
     // Pad multiplier buttons
-    const btns = [null, pad2Btn, pad3Btn, pad4Btn];
-    for (let i = 1; i <= 3; i++) {
+    const btns = [pad1Btn, pad2Btn, pad3Btn, pad4Btn, pad5Btn];
+    for (let i = 0; i < 5; i++) {
         const btn = btns[i];
         const lvl = padMultipliers[i];
         if (lvl >= MAX_PAD_MULT) {
@@ -360,9 +362,11 @@ function gameLoop(timestamp) {
 
 // ---- EVENT LISTENERS ----
 luckBtn.addEventListener('click', buyLuck);
+pad1Btn.addEventListener('click', () => buyPadMultiplier(0));
 pad2Btn.addEventListener('click', () => buyPadMultiplier(1));
 pad3Btn.addEventListener('click', () => buyPadMultiplier(2));
 pad4Btn.addEventListener('click', () => buyPadMultiplier(3));
+pad5Btn.addEventListener('click', () => buyPadMultiplier(4));
 
 // Close tooltips when tapping elsewhere
 document.addEventListener('click', (e) => {
@@ -399,7 +403,7 @@ function loadGame() {
         totalCollected = data.totalCollected || 0;
 
         // Restore pad multiplier labels
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 0; i < 5; i++) {
             if (padMultipliers[i] > 1) {
                 const label = document.getElementById('mult-' + i);
                 if (label) {
