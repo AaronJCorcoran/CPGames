@@ -56,8 +56,7 @@ function petRarity(index) {
 // ---- GAME STATE ----
 let money = 0;
 let luckLevel = 0;
-let padMultipliers = [1, 1, 1, 1, 1];  // pads 0-4
-let padMultBought = [false, false, false, false, false]; // which pads have 2x bought
+let padMultipliers = [1, 1, 1, 1, 1];  // pads 0-4, each upgradeable to 10
 let discovered = new Set();
 let activePets = [];  // { petIndex, padIndex, progress, element }
 let totalCollected = 0;
@@ -68,8 +67,16 @@ const CROSS_TIME = 6000;      // ms to cross a lane
 const BASE_RATE = 0.72;       // probability falloff per tier
 const LUCK_BONUS = 0.006;     // rate increase per luck level
 const MAX_LUCK = 30;
+const MAX_PAD_MULT = 10;
 
-const PAD_MULT_COSTS = [0, 5000, 50000, 500000, 0]; // pads 1,2,3 (indices 1,2,3)
+// Base costs for each pad's first upgrade (1x→2x). Each subsequent level costs 3x more.
+const PAD_MULT_BASE_COST = [0, 5000, 50000, 500000, 0]; // pads 1,2,3
+
+function getPadUpgradeCost(padIndex) {
+    const currentLevel = padMultipliers[padIndex]; // 1 means no upgrades yet
+    if (currentLevel >= MAX_PAD_MULT) return Infinity;
+    return PAD_MULT_BASE_COST[padIndex] * Math.pow(3, currentLevel - 1);
+}
 
 // ---- DOM REFS ----
 const moneyDisplay = document.getElementById('money-display');
@@ -207,16 +214,15 @@ function buyLuck() {
 }
 
 function buyPadMultiplier(padIndex) {
-    const cost = PAD_MULT_COSTS[padIndex];
-    if (money < cost || padMultBought[padIndex]) return;
+    const cost = getPadUpgradeCost(padIndex);
+    if (money < cost || padMultipliers[padIndex] >= MAX_PAD_MULT) return;
     money -= cost;
-    padMultBought[padIndex] = true;
-    padMultipliers[padIndex] = 2;
+    padMultipliers[padIndex]++;
 
     // Update pad label
     const label = document.getElementById('mult-' + padIndex);
     if (label) {
-        label.textContent = '2x';
+        label.textContent = padMultipliers[padIndex] + 'x';
         label.classList.add('active');
     }
 
@@ -295,13 +301,16 @@ function updateShop() {
     const btns = [null, pad2Btn, pad3Btn, pad4Btn];
     for (let i = 1; i <= 3; i++) {
         const btn = btns[i];
-        if (padMultBought[i]) {
-            btn.querySelector('.btn-label').textContent = `Pad ${i + 1}: 2x ✓`;
-            btn.querySelector('.btn-cost').textContent = 'Active!';
+        const lvl = padMultipliers[i];
+        if (lvl >= MAX_PAD_MULT) {
+            btn.querySelector('.btn-label').textContent = `Pad ${i + 1}: 10x MAX`;
+            btn.querySelector('.btn-cost').textContent = 'Maxed!';
             btn.classList.add('purchased');
             btn.classList.remove('disabled');
         } else {
-            const cost = PAD_MULT_COSTS[i];
+            const cost = getPadUpgradeCost(i);
+            btn.querySelector('.btn-label').textContent = `Pad ${i + 1}: ${lvl}x → ${lvl + 1}x`;
+            btn.querySelector('.btn-cost').textContent = formatMoney(cost);
             btn.classList.toggle('disabled', money < cost);
             btn.classList.remove('purchased');
         }
@@ -370,7 +379,6 @@ function saveGame() {
         money,
         luckLevel,
         padMultipliers,
-        padMultBought,
         discovered: [...discovered],
         totalCollected,
     };
@@ -387,16 +395,15 @@ function loadGame() {
         money = data.money || 0;
         luckLevel = data.luckLevel || 0;
         padMultipliers = data.padMultipliers || [1, 1, 1, 1, 1];
-        padMultBought = data.padMultBought || [false, false, false, false, false];
         discovered = new Set(data.discovered || []);
         totalCollected = data.totalCollected || 0;
 
         // Restore pad multiplier labels
         for (let i = 1; i <= 3; i++) {
-            if (padMultBought[i]) {
+            if (padMultipliers[i] > 1) {
                 const label = document.getElementById('mult-' + i);
                 if (label) {
-                    label.textContent = '2x';
+                    label.textContent = padMultipliers[i] + 'x';
                     label.classList.add('active');
                 }
             }
