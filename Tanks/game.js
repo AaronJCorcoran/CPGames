@@ -51,13 +51,29 @@ const TANK_TYPES = {
         sawRadius: 18,
         bulletSpeed: 7,
         bulletSize: 6,
+    },
+    minelayer: {
+        name: 'Minelayer',
+        icon: '💣',
+        width: 40,
+        height: 30,
+        speed: 2.8,
+        hp: 100,
+        attackRange: 0,
+        attackDamage: 60,
+        attackCooldown: 2500,
+        sawRadius: 0,
+        bulletSpeed: 0,
+        bulletSize: 0,
+        mineDamage: 60,
+        mineRadius: 50,
     }
 };
 
 // Team colors
 const TEAM_COLORS = {
-    player: { body: '#3498db', accent: '#2980b9', turret: '#1a6da3', saw: '#5dade2', mega: '#f1c40f' },
-    enemy:  { body: '#e74c3c', accent: '#c0392b', turret: '#a93226', saw: '#ec7063', mega: '#e67e22' }
+    player: { body: '#3498db', accent: '#2980b9', turret: '#1a6da3', saw: '#5dade2', mega: '#f1c40f', mine: '#27ae60' },
+    enemy:  { body: '#e74c3c', accent: '#c0392b', turret: '#a93226', saw: '#ec7063', mega: '#e67e22', mine: '#e74c3c' }
 };
 
 // ---- LEVEL DEFINITIONS ----
@@ -66,26 +82,45 @@ const LEVELS = [
         name: 'Skirmish',
         player: ['sawblade', 'cannon'],
         enemy: ['sawblade', 'cannon'],
+        walls: [],
     },
     {
         name: 'Reinforcements',
         player: ['sawblade', 'cannon'],
         enemy: ['sawblade', 'sawblade', 'cannon'],
+        walls: [],
     },
     {
         name: 'Outnumbered',
         player: ['sawblade', 'cannon', 'sawblade'],
-        enemy: ['sawblade', 'sawblade', 'cannon', 'cannon'],
+        enemy: ['sawblade', 'sawblade', 'cannon', 'cannon', 'sawblade'],
+        walls: [
+            { x: 580, y: 150, w: 40, h: 120 },
+            { x: 580, y: 330, w: 40, h: 120 },
+        ],
     },
     {
         name: 'Heavy Armor',
         player: ['sawblade', 'cannon', 'sawblade'],
-        enemy: ['sawblade', 'cannon', 'cannon', 'mega'],
+        enemy: ['sawblade', 'sawblade', 'cannon', 'cannon', 'mega', 'sawblade'],
+        walls: [
+            { x: 380, y: 200, w: 40, h: 200 },
+            { x: 780, y: 200, w: 40, h: 200 },
+            { x: 550, y: 0, w: 100, h: 40 },
+            { x: 550, y: 560, w: 100, h: 40 },
+        ],
     },
     {
         name: 'Final Stand',
         player: ['sawblade', 'cannon', 'sawblade', 'cannon'],
-        enemy: ['sawblade', 'sawblade', 'cannon', 'cannon', 'mega', 'mega'],
+        enemy: ['sawblade', 'sawblade', 'cannon', 'cannon', 'mega', 'mega', 'sawblade', 'cannon'],
+        walls: [
+            { x: 300, y: 100, w: 30, h: 160 },
+            { x: 300, y: 340, w: 30, h: 160 },
+            { x: 580, y: 220, w: 40, h: 160 },
+            { x: 870, y: 100, w: 30, h: 160 },
+            { x: 870, y: 340, w: 30, h: 160 },
+        ],
     },
 ];
 
@@ -104,12 +139,15 @@ let gameState = {
 const SHOP_ITEMS = [
     { type: 'sawblade', name: '🔧 Sawblade', desc: 'Fast melee attacker', cost: 150 },
     { type: 'cannon', name: '💥 Cannon', desc: 'Ranged shooter', cost: 250 },
+    { type: 'minelayer', name: '💣 Minelayer', desc: 'Drops landmines for enemies', cost: 200 },
     { type: 'mega', name: '⭐ Mega Tank', desc: 'Ranged + melee powerhouse', cost: 500 },
 ];
 
 let tanks = [];
 let bullets = [];
 let particles = [];
+let mines = [];    // { x, y, team, damage, radius, alive }
+let walls = [];    // { x, y, w, h }
 
 // Input
 const keys = {};
@@ -152,6 +190,22 @@ class Tank {
         if (!this.alive) return;
         this.x += this.vx;
         this.y += this.vy;
+        // Wall collisions
+        for (const w of walls) {
+            if (this.x + this.width > w.x && this.x < w.x + w.w &&
+                this.y + this.height > w.y && this.y < w.y + w.h) {
+                // Push out of wall
+                const overlapLeft = (this.x + this.width) - w.x;
+                const overlapRight = (w.x + w.w) - this.x;
+                const overlapTop = (this.y + this.height) - w.y;
+                const overlapBottom = (w.y + w.h) - this.y;
+                const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+                if (minOverlap === overlapLeft) this.x = w.x - this.width;
+                else if (minOverlap === overlapRight) this.x = w.x + w.w;
+                else if (minOverlap === overlapTop) this.y = w.y - this.height;
+                else this.y = w.y + w.h;
+            }
+        }
         this.x = Math.max(0, Math.min(ARENA_W - this.width, this.x));
         this.y = Math.max(0, Math.min(ARENA_H - this.height, this.y));
         if (this.type === 'sawblade' || this.type === 'mega') {
@@ -186,6 +240,8 @@ class Tank {
             this.drawMega(ctx, colors, flash);
         } else if (this.type === 'sawblade') {
             this.drawSawblade(ctx, colors, flash);
+        } else if (this.type === 'minelayer') {
+            this.drawMinelayer(ctx, colors, flash);
         } else {
             this.drawCannon(ctx, colors, flash);
         }
@@ -316,6 +372,34 @@ class Tank {
         ctx.arc(0, 0, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
+    }
+
+    drawMinelayer(ctx, colors, flash) {
+        // Body
+        ctx.fillStyle = flash ? '#fff' : colors.body;
+        ctx.beginPath();
+        ctx.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, 6);
+        ctx.fill();
+        ctx.strokeStyle = colors.mine;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Tracks
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-this.width / 2, -this.height / 2 - 2, this.width, 4);
+        ctx.fillRect(-this.width / 2, this.height / 2 - 2, this.width, 4);
+
+        // Mine symbol
+        ctx.fillStyle = colors.mine;
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('💣', 0, 0);
+
+        // Dispenser at back
+        const backX = this.angle >= -Math.PI / 2 && this.angle <= Math.PI / 2 ? -this.width / 2 - 5 : this.width / 2 + 5;
+        ctx.fillStyle = '#555';
+        ctx.fillRect(backX - 4, -6, 8, 12);
     }
 
     drawHealthBar(ctx) {
@@ -483,8 +567,10 @@ function initLevel() {
     tanks = [];
     bullets = [];
     particles = [];
+    mines = [];
 
     const level = LEVELS[gameState.level];
+    walls = level.walls ? level.walls.map(w => ({...w})) : [];
 
     // Player tanks = base level roster + extra purchased tanks
     const pTypes = [...level.player, ...gameState.extraTanks];
@@ -511,10 +597,17 @@ function initLevel() {
         tanks.push(t);
     }
 
-    // Select first player tank
-    gameState.selectedTankIndex = 0;
+    // Auto-select best tank: Mega > Cannon > Minelayer > Sawblade
     const pt = getPlayerTanks();
-    if (pt.length > 0) pt[0].selected = true;
+    const TANK_PRIORITY = { mega: 0, cannon: 1, minelayer: 2, sawblade: 3 };
+    let bestIdx = 0;
+    let bestPriority = 999;
+    pt.forEach((t, i) => {
+        const p = TANK_PRIORITY[t.type] ?? 99;
+        if (p < bestPriority) { bestPriority = p; bestIdx = i; }
+    });
+    gameState.selectedTankIndex = bestIdx;
+    if (pt.length > 0) pt[bestIdx].selected = true;
 
     gameState.running = true;
 
@@ -609,6 +702,18 @@ function doAttack(tank, enemies) {
             spawnSawSparks(closest.centerX, closest.centerY);
         }
         tank.lastAttackTime = Date.now();
+    } else if (tank.type === 'minelayer') {
+        // Drop a mine at current position
+        mines.push({
+            x: tank.centerX,
+            y: tank.centerY,
+            team: tank.team,
+            damage: TANK_TYPES.minelayer.mineDamage,
+            radius: TANK_TYPES.minelayer.mineRadius,
+            alive: true,
+            timer: 500, // arm delay in ms
+        });
+        tank.lastAttackTime = Date.now();
     }
 }
 
@@ -629,6 +734,27 @@ function updateAllyAI(dt) {
             tank.vx = Math.cos(angle) * tank.speed;
             tank.vy = Math.sin(angle) * tank.speed;
             tank.angle = angle;
+        } else if (tank.type === 'minelayer') {
+            // Run toward enemies but stay at mid range, dropping mines
+            const idealDist = 150;
+            if (targetDist > idealDist + 50) {
+                tank.vx = Math.cos(angle) * tank.speed;
+                tank.vy = Math.sin(angle) * tank.speed;
+            } else if (targetDist < idealDist - 30) {
+                tank.vx = -Math.cos(angle) * tank.speed;
+                tank.vy = -Math.sin(angle) * tank.speed;
+            } else {
+                // Strafe sideways
+                const strafe = angle + Math.PI / 2;
+                tank.vx = Math.cos(strafe) * tank.speed * 0.7;
+                tank.vy = Math.sin(strafe) * tank.speed * 0.7;
+            }
+            tank.angle = angle;
+            // Always try to drop mines
+            if (tank.canAttack()) {
+                mines.push({ x: tank.centerX, y: tank.centerY, team: tank.team, damage: TANK_TYPES.minelayer.mineDamage, radius: TANK_TYPES.minelayer.mineRadius, alive: true, timer: 500 });
+                tank.lastAttackTime = Date.now();
+            }
         } else {
             const idealDist = tank.type === 'mega' ? 180 : 220;
             if (targetDist < idealDist - 40) {
@@ -673,6 +799,24 @@ function updateEnemyAI(dt) {
             tank.vx = Math.cos(angleToTarget) * tank.speed;
             tank.vy = Math.sin(angleToTarget) * tank.speed;
             tank.angle = angleToTarget;
+        } else if (tank.type === 'minelayer') {
+            const idealDist = 150;
+            if (targetDist > idealDist + 50) {
+                tank.vx = Math.cos(angleToTarget) * tank.speed;
+                tank.vy = Math.sin(angleToTarget) * tank.speed;
+            } else if (targetDist < idealDist - 30) {
+                tank.vx = -Math.cos(angleToTarget) * tank.speed;
+                tank.vy = -Math.sin(angleToTarget) * tank.speed;
+            } else {
+                const strafe = angleToTarget + Math.PI / 2;
+                tank.vx = Math.cos(strafe) * tank.speed * 0.7;
+                tank.vy = Math.sin(strafe) * tank.speed * 0.7;
+            }
+            tank.angle = angleToTarget;
+            if (tank.canAttack()) {
+                mines.push({ x: tank.centerX, y: tank.centerY, team: tank.team, damage: TANK_TYPES.minelayer.mineDamage, radius: TANK_TYPES.minelayer.mineRadius, alive: true, timer: 500 });
+                tank.lastAttackTime = Date.now();
+            }
         } else {
             const idealDist = tank.type === 'mega' ? 200 : 250;
             if (targetDist < idealDist - 50) {
@@ -696,6 +840,15 @@ function updateEnemyAI(dt) {
 // ---- COLLISION ----
 function checkBulletCollisions() {
     for (const bullet of bullets) {
+        if (!bullet.alive) continue;
+        // Bullet vs walls
+        for (const w of walls) {
+            if (bullet.x > w.x && bullet.x < w.x + w.w && bullet.y > w.y && bullet.y < w.y + w.h) {
+                bullet.alive = false;
+                spawnDamageParticles(bullet.x, bullet.y, 'player');
+                break;
+            }
+        }
         if (!bullet.alive) continue;
         for (const tank of tanks) {
             if (!tank.alive || tank.team === bullet.team) continue;
@@ -810,6 +963,42 @@ function drawArena() {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(LEVELS[gameState.level].name, ARENA_W / 2, ARENA_H / 2);
+
+    // Draw walls
+    for (const w of walls) {
+        ctx.fillStyle = '#6b5b3a';
+        ctx.fillRect(w.x, w.y, w.w, w.h);
+        ctx.strokeStyle = '#8b7355';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(w.x, w.y, w.w, w.h);
+        // Brick pattern
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.lineWidth = 1;
+        for (let by = w.y; by < w.y + w.h; by += 12) {
+            ctx.beginPath(); ctx.moveTo(w.x, by); ctx.lineTo(w.x + w.w, by); ctx.stroke();
+        }
+    }
+
+    // Draw mines
+    for (const m of mines) {
+        if (!m.alive) continue;
+        const armed = m.timer <= 0;
+        ctx.globalAlpha = armed ? 0.9 : 0.4;
+        ctx.fillStyle = m.team === 'player' ? '#3498db' : '#e74c3c';
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = armed ? '#f1c40f' : '#999';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        if (armed) {
+            ctx.fillStyle = '#f1c40f';
+            ctx.beginPath();
+            ctx.arc(m.x, m.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+    }
 }
 
 function drawParticles() {
@@ -917,6 +1106,26 @@ function gameLoop(timestamp) {
         checkBulletCollisions();
         checkTankCollisions();
 
+        // Update mines
+        for (const m of mines) {
+            if (!m.alive) continue;
+            if (m.timer > 0) { m.timer -= dt; continue; }
+            // Check for enemy tanks stepping on mine
+            for (const tank of tanks) {
+                if (!tank.alive || tank.team === m.team) continue;
+                const dx = tank.centerX - m.x;
+                const dy = tank.centerY - m.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < m.radius) {
+                    tank.takeDamage(m.damage);
+                    spawnExplosion(m.x, m.y);
+                    m.alive = false;
+                    break;
+                }
+            }
+        }
+        mines = mines.filter(m => m.alive);
+
         for (const p of particles) {
             p.x += p.vx;
             p.y += p.vy;
@@ -952,6 +1161,8 @@ function gameLoop(timestamp) {
 
 // Keyboard
 document.addEventListener('keydown', (e) => {
+    const gameKeys = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','W','A','S','D',' '];
+    if (gameKeys.includes(e.key)) e.preventDefault();
     keys[e.key] = true;
     keys[e.code] = true;
     const num = parseInt(e.key);
