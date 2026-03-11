@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cedar Phoenix Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 16px;
+            color: #ecf0f1;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .logo {
+            font-size: 2.4rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #f39c12, #e74c3c, #9b59b6, #3498db, #2ecc71);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 28px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .game-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card:active {
+            transform: scale(0.97);
+        }
+
+        .game-icon {
+            font-size: 3.5rem;
+            line-height: 1;
+        }
+
+        .game-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .game-desc {
+            font-size: 0.85rem;
+            color: #95a5a6;
+            line-height: 1.4;
+        }
+
+        .play-tag {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* Individual card themes */
+        .card-glass { border-color: rgba(102, 126, 234, 0.3); }
+        .card-glass:hover { border-color: rgba(102, 126, 234, 0.6); box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15); }
+        .card-glass .play-tag { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+
+        .card-parkour { border-color: rgba(46, 204, 113, 0.3); }
+        .card-parkour:hover { border-color: rgba(46, 204, 113, 0.6); box-shadow: 0 12px 40px rgba(46, 204, 113, 0.15); }
+        .card-parkour .play-tag { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+
+        .card-petio { border-color: rgba(241, 196, 15, 0.3); }
+        .card-petio:hover { border-color: rgba(241, 196, 15, 0.6); box-shadow: 0 12px 40px rgba(241, 196, 15, 0.15); }
+        .card-petio .play-tag { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+
+        .card-tanks { border-color: rgba(231, 76, 60, 0.3); }
+        .card-tanks:hover { border-color: rgba(231, 76, 60, 0.6); box-shadow: 0 12px 40px rgba(231, 76, 60, 0.15); }
+        .card-tanks .play-tag { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+        @media (max-width: 600px) {
+            .logo { font-size: 1.8rem; }
+            .games-grid { grid-template-columns: 1fr; gap: 14px; }
+            .game-card { padding: 22px 18px; }
+            .game-icon { font-size: 2.8rem; }
+            .game-title { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">🎮 Cedar Phoenix Games 🎮</div>
+    <p class="subtitle">Pick a game and jump in!</p>
+
+    <div class="games-grid">
+        <a href="GlassBridge/index.html" class="game-card card-glass">
+            <div class="game-icon">🌉</div>
+            <div class="game-title">Glass Bridge</div>
+            <div class="game-desc">Choose the right glass panel and cross the bridge without falling!</div>
+            <span class="play-tag">▶ Play</span>
+        </a>
+
+        <a href="ObstacleCourse/index.html" class="game-card card-parkour">
+            <div class="game-icon">🏃</div>
+            <div class="game-title">Phoenix's Parkour</div>
+            <div class="game-desc">Run, jump, and dodge through obstacle courses. Collect coins and power-ups!</div>
+            <span class="play-tag">▶ Play</span>
+        </a>
+
+        <a href="PetIo/index.html" class="game-card card-petio">
+            <div class="game-icon">🐾</div>
+            <div class="game-title">Pet.io</div>
+            <div class="game-desc">Tap pets as they cross the lanes to collect money. Discover all 32 pets!</div>
+            <span class="play-tag">▶ Play</span>
+        </a>
+
+        <a href="Tanks/index.html" class="game-card card-tanks">
+            <div class="game-icon">🔥</div>
+            <div class="game-title">Tank Battle</div>
+            <div class="game-desc">Command your tanks in epic battles! Combine sawblades and cannons for power.</div>
+            <span class="play-tag">▶ Play</span>
+        </a>
+    </div>
+</body>
+</html>

@@ -7,7 +7,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a href="../index.html" class="home-btn">🏠 Home</a>
     <div id="game-container">
+        <div id="profile-bar">
+            <button class="profile-btn active" data-profile="1">👤 Profile 1</button>
+            <button class="profile-btn" data-profile="2">👤 Profile 2</button>
+            <button class="profile-btn" data-profile="3">👤 Profile 3</button>
+        </div>
         <header>
             <h1>🐾 Pet.io</h1>
             <div id="money-display">💰 $0</div>
@@ -90,6 +96,11 @@
         <div id="collection">
             <h2>📋 Collection <span id="discovered-count">0</span>/32</h2>
             <div id="pet-grid"></div>
+        </div>
+
+        <div id="reset-section">
+            <p class="reset-warning">⚠️ This will erase this profile's progress</p>
+            <button id="reset-btn" class="reset-btn">🗑️ Reset Profile</button>
         </div>
     </div>
 

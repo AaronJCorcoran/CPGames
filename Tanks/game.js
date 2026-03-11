@@ -96,7 +96,16 @@ let gameState = {
     round: 1,
     score: 0,
     selectedTankIndex: 0,
+    money: 0,
+    extraTanks: [],  // additional tanks bought from shop
+    loopCount: 0,    // how many times all 5 levels have been beaten
 };
+
+const SHOP_ITEMS = [
+    { type: 'sawblade', name: '🔧 Sawblade', desc: 'Fast melee attacker', cost: 150 },
+    { type: 'cannon', name: '💥 Cannon', desc: 'Ranged shooter', cost: 250 },
+    { type: 'mega', name: '⭐ Mega Tank', desc: 'Ranged + melee powerhouse', cost: 500 },
+];
 
 let tanks = [];
 let bullets = [];
@@ -477,16 +486,23 @@ function initLevel() {
 
     const level = LEVELS[gameState.level];
 
-    // Spawn player tanks on left side
-    const pTypes = level.player;
+    // Player tanks = base level roster + extra purchased tanks
+    const pTypes = [...level.player, ...gameState.extraTanks];
     const pSpacing = ARENA_H / (pTypes.length + 1);
     for (let i = 0; i < pTypes.length; i++) {
         const t = new Tank(pTypes[i], 'player', 40 + Math.random() * 60, pSpacing * (i + 1) - 20);
         tanks.push(t);
     }
 
-    // Spawn enemy tanks on right side
-    const eTypes = level.enemy;
+    // Spawn enemy tanks on right side (scale with loop count)
+    const eBase = [...level.enemy];
+    // Each loop adds extra enemy tanks
+    for (let loop = 0; loop < gameState.loopCount; loop++) {
+        eBase.push('sawblade');
+        if (loop % 2 === 0) eBase.push('cannon');
+        if (loop >= 2) eBase.push('mega');
+    }
+    const eTypes = eBase;
     const eSpacing = ARENA_H / (eTypes.length + 1);
     for (let i = 0; i < eTypes.length; i++) {
         const t = new Tank(eTypes[i], 'enemy', ARENA_W - 100 - Math.random() * 60, eSpacing * (i + 1) - 20);
@@ -725,15 +741,22 @@ function checkGameEnd() {
 
     if (!playerAlive) {
         gameState.running = false;
+        const defeatMoney = 25 + 25 * gameState.level;
+        gameState.money += defeatMoney;
         document.getElementById('gameOverTitle').textContent = '💀 DEFEAT 💀';
-        document.getElementById('gameOverMsg').textContent = 'Your tanks were destroyed!';
+        document.getElementById('gameOverMsg').textContent = 'Your tanks were destroyed! Retry the level or visit the shop.';
         document.getElementById('finalScore').textContent = gameState.score;
+        document.getElementById('moneyEarned').textContent = '+' + defeatMoney + ' coins (defeat bonus)';
+        document.getElementById('shopBtn').style.display = '';
         document.getElementById('nextRoundBtn').style.display = 'none';
         document.getElementById('playAgainBtn').style.display = '';
-        document.getElementById('playAgainBtn').textContent = '🔄 Restart';
+        document.getElementById('playAgainBtn').textContent = '🔄 Retry Level';
+        document.getElementById('playAgainBtn').dataset.action = 'retry';
         document.getElementById('gameOverOverlay').classList.remove('hidden');
     } else if (!enemyAlive) {
         gameState.running = false;
+        const moneyEarned = 100 + 50 * gameState.level;
+        gameState.money += moneyEarned;
         gameState.score += 100 * (gameState.level + 1);
         const isLastLevel = gameState.level >= LEVELS.length - 1;
         document.getElementById('gameOverTitle').textContent = isLastLevel ? '🎉 YOU WIN THE GAME! 🎉' : '🏆 VICTORY! 🏆';
@@ -742,10 +765,13 @@ function checkGameEnd() {
             ? 'All 5 levels complete! Final Score: ' + gameState.score
             : '"' + lvl.name + '" complete! Next: "' + LEVELS[gameState.level + 1].name + '"';
         document.getElementById('finalScore').textContent = gameState.score;
+        document.getElementById('moneyEarned').textContent = '+' + moneyEarned + ' coins earned!';
+        document.getElementById('shopBtn').style.display = '';
         if (isLastLevel) {
             document.getElementById('nextRoundBtn').style.display = 'none';
             document.getElementById('playAgainBtn').style.display = '';
-            document.getElementById('playAgainBtn').textContent = '🔄 Play Again';
+            document.getElementById('playAgainBtn').textContent = '🔄 Play Again (Keep Tanks)';
+            document.getElementById('playAgainBtn').dataset.action = 'newgameplus';
         } else {
             document.getElementById('nextRoundBtn').style.display = '';
             document.getElementById('playAgainBtn').style.display = 'none';
@@ -828,6 +854,7 @@ function updateHUD() {
     document.getElementById('levelNum').textContent = gameState.level + 1;
     document.getElementById('roundNum').textContent = gameState.round;
     document.getElementById('score').textContent = gameState.score;
+    document.getElementById('moneyDisplay').textContent = gameState.money;
 
     // Update HP bars
     document.querySelectorAll('.tank-health').forEach(row => {
@@ -1024,10 +1051,84 @@ document.getElementById('nextRoundBtn').addEventListener('click', () => {
 // Play Again / Restart button
 document.getElementById('playAgainBtn').addEventListener('click', () => {
     document.getElementById('gameOverOverlay').classList.add('hidden');
-    gameState.level = 0;
-    gameState.round = 1;
-    gameState.score = 0;
-    initLevel();
+    const action = document.getElementById('playAgainBtn').dataset.action;
+    if (action === 'retry') {
+        // Retry same level — keep money and extra tanks
+        initLevel();
+    } else if (action === 'newgameplus') {
+        // Beat all 5 levels — restart from level 1 but keep tanks and money
+        gameState.loopCount++;
+        gameState.level = 0;
+        gameState.round = 1;
+        gameState.score = 0;
+        initLevel();
+    } else {
+        // Full restart from level 1
+        gameState.level = 0;
+        gameState.round = 1;
+        gameState.score = 0;
+        gameState.money = 0;
+        gameState.extraTanks = [];
+        gameState.loopCount = 0;
+        initLevel();
+    }
+});
+
+// ---- SHOP SYSTEM ----
+function openShop() {
+    document.getElementById('gameOverOverlay').classList.add('hidden');
+    document.getElementById('shopOverlay').classList.remove('hidden');
+    renderShop();
+}
+
+function renderShop() {
+    document.getElementById('shopMoney').textContent = gameState.money;
+
+    // Roster display
+    const rosterEl = document.getElementById('rosterDisplay');
+    const level = LEVELS[Math.min(gameState.level + 1, LEVELS.length - 1)];
+    const allPlayerTanks = [...level.player, ...gameState.extraTanks];
+    rosterEl.innerHTML = '';
+    allPlayerTanks.forEach(t => {
+        const tag = document.createElement('span');
+        tag.className = 'roster-tank';
+        tag.textContent = TANK_TYPES[t].icon + ' ' + TANK_TYPES[t].name;
+        rosterEl.appendChild(tag);
+    });
+
+    // Shop items
+    const itemsEl = document.getElementById('shopItems');
+    itemsEl.innerHTML = '';
+    SHOP_ITEMS.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'shop-item';
+        const canAfford = gameState.money >= item.cost;
+        div.innerHTML =
+            '<div class="shop-item-info">' +
+                '<span class="shop-item-icon">' + TANK_TYPES[item.type].icon + '</span>' +
+                '<div>' +
+                    '<div class="shop-item-name">' + TANK_TYPES[item.type].name + '</div>' +
+                    '<div class="shop-item-stats">HP: ' + TANK_TYPES[item.type].hp + ' · DMG: ' + TANK_TYPES[item.type].attackDamage + ' · ' + item.desc + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<button class="shop-buy-btn' + (canAfford ? '' : ' disabled') + '">' + item.cost + ' 💰</button>';
+        const btn = div.querySelector('.shop-buy-btn');
+        btn.addEventListener('click', () => {
+            if (gameState.money >= item.cost) {
+                gameState.money -= item.cost;
+                gameState.extraTanks.push(item.type);
+                renderShop();
+            }
+        });
+        itemsEl.appendChild(div);
+    });
+}
+
+document.getElementById('shopBtn').addEventListener('click', openShop);
+
+document.getElementById('shopCloseBtn').addEventListener('click', () => {
+    document.getElementById('shopOverlay').classList.add('hidden');
+    document.getElementById('gameOverOverlay').classList.remove('hidden');
 });
 
 // ---- START ----

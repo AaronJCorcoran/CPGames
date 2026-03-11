@@ -4,6 +4,24 @@
     box-sizing: border-box;
 }
 
+.home-btn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 9999;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 8px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s;
+}
+.home-btn:hover { background: rgba(0,0,0,0.7); border-color: rgba(255,255,255,0.4); }
+
 body {
     font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
@@ -398,4 +416,159 @@ body {
     .team-hud h3 { font-size: 0.8em; }
     .tank-health { font-size: 0.7em; }
     .tank-name { width: 55px; }
+}
+
+/* Money HUD */
+.money-hud {
+    font-size: 1em;
+    font-weight: bold;
+    color: #f1c40f;
+    margin-top: 4px;
+}
+
+.money-earned {
+    color: #2ecc71;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Shop open button */
+.shop-open-btn {
+    background: #f39c12 !important;
+}
+.shop-open-btn:hover {
+    background: #e67e22 !important;
+}
+
+/* Shop Overlay */
+.shop-content {
+    background: #1a1a2e;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    border: 3px solid #f1c40f;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.shop-content h2 {
+    color: #f1c40f;
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+.shop-money {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #f1c40f;
+    margin-bottom: 6px;
+}
+
+.shop-subtitle {
+    color: #95a5a6;
+    font-size: 0.9em;
+    margin-bottom: 16px;
+}
+
+.shop-roster {
+    background: rgba(52, 152, 219, 0.1);
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 16px;
+}
+
+.shop-roster h3 {
+    color: #3498db;
+    font-size: 0.95em;
+    margin-bottom: 8px;
+}
+
+#rosterDisplay {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.roster-tank {
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid rgba(52, 152, 219, 0.4);
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.shop-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.shop-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.2s;
+}
+
+.shop-item-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+.shop-item-icon {
+    font-size: 2em;
+}
+
+.shop-item-name {
+    color: #ecf0f1;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.shop-item-stats {
+    color: #95a5a6;
+    font-size: 0.75em;
+}
+
+.shop-buy-btn {
+    padding: 10px 18px;
+    background: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.shop-buy-btn:hover {
+    background: #27ae60;
+}
+
+.shop-buy-btn:active {
+    transform: scale(0.95);
+}
+
+.shop-buy-btn.disabled {
+    background: #555;
+    cursor: default;
+    opacity: 0.5;
 }

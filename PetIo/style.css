@@ -8,6 +8,24 @@
     box-sizing: border-box;
 }
 
+.home-btn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 9999;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 8px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s;
+}
+.home-btn:hover { background: rgba(0,0,0,0.7); border-color: rgba(255,255,255,0.4); }
+
 body {
     background: #1a1a2e;
     color: #ecf0f1;
@@ -157,7 +175,13 @@ header h1 {
     z-index: 2;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
     transition: left 0.05s linear;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pet:active {
+    transform: translateY(-50%) scale(0.8);
 }
 
 .pet .pet-emoji {
@@ -213,6 +237,14 @@ header h1 {
     transition: all 0.3s ease-in;
     opacity: 0;
     transform: translateY(-50%) scale(0.3);
+}
+
+/* ---- MISSED PET ANIMATION ---- */
+.pet.missed {
+    transition: all 0.4s ease-out;
+    opacity: 0;
+    transform: translateY(-50%) translateX(30px) scale(0.5);
+    pointer-events: none;
 }
 
 /* ---- SHOP ---- */
@@ -369,6 +401,91 @@ header h1 {
 
 .pet-cell.show-tooltip .pet-tooltip {
     display: block;
+}
+
+/* ---- PROFILE BAR ---- */
+#profile-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+    padding: 8px 0;
+}
+
+.profile-btn {
+    flex: 1;
+    max-width: 160px;
+    padding: 10px 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #95a5a6;
+    font-size: 0.85rem;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.profile-btn:active {
+    transform: scale(0.95);
+}
+
+.profile-btn.active {
+    background: rgba(52, 152, 219, 0.15);
+    border-color: rgba(52, 152, 219, 0.5);
+    color: #3498db;
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.2);
+}
+
+.profile-btn .profile-money {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: normal;
+    color: #2ecc71;
+    margin-top: 2px;
+}
+
+.profile-btn:not(.active) .profile-money {
+    color: #7f8c8d;
+}
+
+/* ---- RESET BUTTON ---- */
+#reset-section {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.reset-warning {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
+
+.reset-btn {
+    background: rgba(231, 76, 60, 0.15);
+    border: 2px solid rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+    font-size: 0.95rem;
+    font-weight: bold;
+    padding: 12px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.reset-btn:hover {
+    background: rgba(231, 76, 60, 0.25);
+    border-color: rgba(231, 76, 60, 0.6);
+}
+
+.reset-btn:active {
+    transform: scale(0.95);
 }
 
 /* ---- RESPONSIVE ---- */

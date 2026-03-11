@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a href="../index.html" class="home-btn">🏠 Home</a>
     <div class="game-container">
         <div class="header">
             <h1>🔥 TANK BATTLE 🔥</h1>
@@ -21,6 +22,7 @@
                 <div class="level-label">Level <span id="levelNum">1</span>/5</div>
                 <div class="round-number">Round <span id="roundNum">1</span></div>
                 <div class="score">Score: <span id="score">0</span></div>
+                <div class="money-hud">💰 <span id="moneyDisplay">0</span></div>
             </div>
             <div class="team-hud team-enemy">
                 <h3>🟥 Enemy Team</h3>
@@ -63,8 +65,25 @@
             <h2 id="gameOverTitle">🏆 VICTORY! 🏆</h2>
             <p id="gameOverMsg">You destroyed the enemy team!</p>
             <p class="final-score">Score: <span id="finalScore">0</span></p>
+            <p class="money-earned" id="moneyEarned"></p>
+            <button id="shopBtn" class="play-again-btn shop-open-btn">🛒 Shop</button>
             <button id="nextRoundBtn" class="play-again-btn">▶️ Next Round</button>
             <button id="playAgainBtn" class="play-again-btn" style="display:none;">Restart</button>
+        </div>
+    </div>
+
+    <!-- Shop Overlay -->
+    <div class="overlay hidden" id="shopOverlay">
+        <div class="shop-content">
+            <h2>🛒 Tank Shop</h2>
+            <div class="shop-money">💰 <span id="shopMoney">0</span></div>
+            <p class="shop-subtitle">Buy tanks to add to your team for the next round</p>
+            <div class="shop-roster">
+                <h3>Your Roster</h3>
+                <div id="rosterDisplay"></div>
+            </div>
+            <div class="shop-items" id="shopItems"></div>
+            <button id="shopCloseBtn" class="play-again-btn">✅ Done</button>
         </div>
     </div>
 

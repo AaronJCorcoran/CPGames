@@ -512,9 +512,27 @@
             font-size: 1em;
             margin-bottom: 15px;
         }
+        .home-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 9999;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 8px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.2s;
+        }
+        .home-btn:hover { background: rgba(0,0,0,0.7); border-color: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
+    <a href="../index.html" class="home-btn">🏠 Home</a>
     <div class="mode-selector" id="mode-selector">
         <div class="mode-content">
             <h2>🎮 Choose Game Mode 🎮</h2>

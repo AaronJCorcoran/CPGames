@@ -146,6 +146,25 @@ function spawnPet() {
     el.innerHTML = `<span class="pet-emoji">${pet.emoji}</span>`;
     el.style.left = '-30px';
 
+    // Tap to collect
+    el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = activePets.findIndex(p => p.element === el);
+        if (idx !== -1) {
+            collectPet(activePets[idx]);
+            activePets.splice(idx, 1);
+        }
+    });
+    el.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const idx = activePets.findIndex(p => p.element === el);
+        if (idx !== -1) {
+            collectPet(activePets[idx]);
+            activePets.splice(idx, 1);
+        }
+    }, { passive: false });
+
     padLanes[padIndex].appendChild(el);
 
     activePets.push({
@@ -353,9 +372,13 @@ function gameLoop(timestamp) {
         const pxPos = p.progress * (laneWidth + 30) - 30; // start offscreen left
         p.element.style.left = pxPos + 'px';
 
-        // Reached collector
+        // Reached end of lane — missed! Pet escapes
         if (p.progress >= 1) {
-            collectPet(p);
+            p.element.classList.add('missed');
+            const elRef = p.element;
+            setTimeout(() => {
+                if (elRef.parentNode) elRef.parentNode.removeChild(elRef);
+            }, 400);
             activePets.splice(i, 1);
         }
     }
@@ -385,6 +408,13 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// ---- PROFILES ----
+let currentProfile = parseInt(localStorage.getItem('petio_activeProfile') || '1');
+
+function getSaveKey(profile) {
+    return 'petio_save_p' + profile;
+}
+
 // ---- SAVE / LOAD ----
 function saveGame() {
     const data = {
@@ -395,13 +425,14 @@ function saveGame() {
         totalCollected,
     };
     try {
-        localStorage.setItem('petio_save', JSON.stringify(data));
+        localStorage.setItem(getSaveKey(currentProfile), JSON.stringify(data));
     } catch (e) { /* ignore */ }
+    updateProfileButtons();
 }
 
 function loadGame() {
     try {
-        const raw = localStorage.getItem('petio_save');
+        const raw = localStorage.getItem(getSaveKey(currentProfile));
         if (!raw) return;
         const data = JSON.parse(raw);
         money = data.money || 0;
@@ -423,8 +454,99 @@ function loadGame() {
     } catch (e) { /* ignore */ }
 }
 
+function clearActivePets() {
+    activePets.forEach(p => {
+        if (p.element.parentNode) p.element.parentNode.removeChild(p.element);
+    });
+    activePets = [];
+}
+
+function resetState() {
+    money = 0;
+    luckLevel = 0;
+    padMultipliers = [1, 1, 1, 1, 1];
+    discovered = new Set();
+    totalCollected = 0;
+    clearActivePets();
+    for (let i = 0; i < 5; i++) {
+        const label = document.getElementById('mult-' + i);
+        if (label) {
+            label.textContent = '1x';
+            label.classList.remove('active');
+        }
+    }
+}
+
+function switchProfile(profileNum) {
+    // Save current profile first
+    saveGame();
+    // Switch
+    currentProfile = profileNum;
+    localStorage.setItem('petio_activeProfile', String(profileNum));
+    // Reset state and load new profile
+    resetState();
+    loadGame();
+    buildCollection();
+    updateHUD();
+    updateShop();
+    updateCollection();
+    updateProfileButtons();
+}
+
+function getProfilePreview(profileNum) {
+    try {
+        const raw = localStorage.getItem(getSaveKey(profileNum));
+        if (!raw) return '$0';
+        const data = JSON.parse(raw);
+        return formatMoney(data.money || 0);
+    } catch (e) { return '$0'; }
+}
+
+function updateProfileButtons() {
+    document.querySelectorAll('.profile-btn').forEach(btn => {
+        const p = parseInt(btn.dataset.profile);
+        btn.classList.toggle('active', p === currentProfile);
+        const preview = getProfilePreview(p);
+        btn.innerHTML = `👤 Profile ${p}<span class="profile-money">${preview}</span>`;
+    });
+}
+
+// Profile button listeners
+document.querySelectorAll('.profile-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const p = parseInt(btn.dataset.profile);
+        if (p !== currentProfile) switchProfile(p);
+    });
+});
+
 // Auto-save every 5 seconds
 setInterval(saveGame, 5000);
+
+// ---- RESET ----
+const resetBtn = document.getElementById('reset-btn');
+resetBtn.addEventListener('click', () => {
+    if (confirm('Are you sure? This will erase Profile ' + currentProfile + ' progress!')) {
+        localStorage.removeItem(getSaveKey(currentProfile));
+        resetState();
+        buildCollection();
+        updateHUD();
+        updateShop();
+        updateCollection();
+        updateProfileButtons();
+    }
+});
+
+// ---- MIGRATE OLD SAVE ----
+// If there's an old single-slot save, move it to Profile 1
+(function migrateOldSave() {
+    try {
+        const old = localStorage.getItem('petio_save');
+        if (old && !localStorage.getItem(getSaveKey(1))) {
+            localStorage.setItem(getSaveKey(1), old);
+            localStorage.removeItem('petio_save');
+        }
+    } catch (e) { /* ignore */ }
+})();
 
 // ---- INIT ----
 loadGame();
@@ -432,4 +554,5 @@ buildCollection();
 updateHUD();
 updateShop();
 updateCollection();
+updateProfileButtons();
 requestAnimationFrame(gameLoop);
