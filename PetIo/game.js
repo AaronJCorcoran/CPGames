@@ -2,7 +2,7 @@
 // PET.IO - game.js
 // ========================
 
-// ---- PET DEFINITIONS (32 pets) ----
+// ---- PET DEFINITIONS (64 pets) ----
 const PETS = [
     { emoji: '🐛', name: 'Worm' },
     { emoji: '🐌', name: 'Snail' },
@@ -36,6 +36,38 @@ const PETS = [
     { emoji: '💎', name: 'Gem Pup' },
     { emoji: '👑', name: 'King Pet' },
     { emoji: '🌈', name: 'Rainbow' },
+    { emoji: '🦋', name: 'Butterfly' },
+    { emoji: '🐝', name: 'Bee' },
+    { emoji: '🕷️', name: 'Spider' },
+    { emoji: '🦎', name: 'Lizard' },
+    { emoji: '🐢', name: 'Turtle' },
+    { emoji: '🐍', name: 'Snake' },
+    { emoji: '🦜', name: 'Parrot' },
+    { emoji: '🦆', name: 'Duck' },
+    { emoji: '🐧', name: 'Penguin' },
+    { emoji: '🦉', name: 'Owl' },
+    { emoji: '🦇', name: 'Bat' },
+    { emoji: '🦡', name: 'Badger' },
+    { emoji: '🦦', name: 'Otter' },
+    { emoji: '🦥', name: 'Sloth' },
+    { emoji: '🦘', name: 'Kangaroo' },
+    { emoji: '🦬', name: 'Bison' },
+    { emoji: '🐪', name: 'Camel' },
+    { emoji: '🦒', name: 'Giraffe' },
+    { emoji: '🦓', name: 'Zebra' },
+    { emoji: '🐆', name: 'Leopard' },
+    { emoji: '🐻‍❄️', name: 'Polar Bear' },
+    { emoji: '🦭', name: 'Seal' },
+    { emoji: '🐬', name: 'Dolphin' },
+    { emoji: '🐙', name: 'Octopus' },
+    { emoji: '🦑', name: 'Squid' },
+    { emoji: '🦞', name: 'Lobster' },
+    { emoji: '🦀', name: 'Crab' },
+    { emoji: '🐳', name: 'Blue Whale' },
+    { emoji: '🦕', name: 'Sauropod' },
+    { emoji: '🦖', name: 'T-Rex' },
+    { emoji: '🔥', name: 'Phoenix' },
+    { emoji: '🌟', name: 'Star Spirit' },
 ];
 
 // Value: $10 × 2^index
@@ -45,11 +77,11 @@ function petValue(index) {
 
 // Rarity tier
 function petRarity(index) {
-    if (index <= 7) return 'common';
-    if (index <= 15) return 'uncommon';
-    if (index <= 23) return 'rare';
-    if (index <= 27) return 'epic';
-    if (index <= 30) return 'legendary';
+    if (index <= 15) return 'common';
+    if (index <= 31) return 'uncommon';
+    if (index <= 47) return 'rare';
+    if (index <= 55) return 'epic';
+    if (index <= 61) return 'legendary';
     return 'mythic';
 }
 
@@ -57,9 +89,10 @@ function petRarity(index) {
 let money = 0;
 let luckLevel = 0;
 let padMultipliers = [1, 1, 1, 1, 1];  // pads 0-4, each upgradeable to 10
-let discovered = new Set();
-let activePets = [];  // { petIndex, padIndex, progress, element }
+let discovered = new Map(); // petIndex → count
+let activePets = [];  // { petIndex, padIndex, progress, element, tier }
 let totalCollected = 0;
+let spawnCount = 0;
 
 // ---- CONSTANTS ----
 const SPAWN_MIN = 400;        // fastest spawn gap (ms)
@@ -91,6 +124,9 @@ const pad4Btn = document.getElementById('pad4-btn');
 const pad5Btn = document.getElementById('pad5-btn');
 const petGrid = document.getElementById('pet-grid');
 const discoveredCountEl = document.getElementById('discovered-count');
+const msGoldCount = document.getElementById('ms-gold-count');
+const msDiamondCount = document.getElementById('ms-diamond-count');
+const msRainbowCount = document.getElementById('ms-rainbow-count');
 
 // ---- FORMAT MONEY ----
 function formatMoney(n) {
@@ -140,9 +176,15 @@ function spawnPet() {
     const pet = PETS[petIndex];
     const rarity = petRarity(petIndex);
 
+    spawnCount++;
+    let tier = 'normal';
+    if (spawnCount % 500 === 0) tier = 'rainbow';
+    else if (spawnCount % 100 === 0) tier = 'diamond';
+    else if (spawnCount % 10 === 0) tier = 'gold';
+
     // Create DOM element
     const el = document.createElement('div');
-    el.className = `pet ${rarity}`;
+    el.className = `pet ${rarity}${tier !== 'normal' ? ' tier-' + tier : ''}`;
     el.innerHTML = `<span class="pet-emoji">${pet.emoji}</span>`;
     el.style.left = '-30px';
 
@@ -172,6 +214,7 @@ function spawnPet() {
         padIndex,
         progress: 0,
         element: el,
+        tier,
     });
 }
 
@@ -179,16 +222,14 @@ function spawnPet() {
 function collectPet(petObj) {
     const baseVal = petValue(petObj.petIndex);
     const mult = padMultipliers[petObj.padIndex];
-    const earned = baseVal * mult;
+    const tierMult = petObj.tier === 'rainbow' ? 100 : petObj.tier === 'diamond' ? 10 : petObj.tier === 'gold' ? 2 : 1;
+    const earned = baseVal * mult * tierMult;
 
     money += earned;
     totalCollected++;
 
-    // Track discovery
-    if (!discovered.has(petObj.petIndex)) {
-        discovered.add(petObj.petIndex);
-        updateCollection();
-    }
+    // Track count
+    discovered.set(petObj.petIndex, (discovered.get(petObj.petIndex) || 0) + 1);
 
     // Money popup
     showMoneyPopup(petObj.padIndex, earned);
@@ -262,6 +303,11 @@ function buildCollection() {
         cell.dataset.index = i;
         cell.textContent = '?';
 
+        // Count badge
+        const countEl = document.createElement('span');
+        countEl.className = 'pet-count';
+        cell.appendChild(countEl);
+
         // Tooltip
         const tip = document.createElement('div');
         tip.className = 'pet-tooltip';
@@ -288,6 +334,10 @@ function updateCollection() {
             cell.classList.remove('undiscovered');
             cell.classList.add('discovered');
             cell.childNodes[0].textContent = PETS[i].emoji;
+
+            const count = discovered.get(i);
+            const countEl = cell.querySelector('.pet-count');
+            if (countEl) countEl.textContent = count >= 1000 ? Math.floor(count / 1000) + 'k' : count;
 
             const tip = cell.querySelector('.pet-tooltip');
             const prob = getProbability(i);
@@ -339,6 +389,16 @@ function updateShop() {
     }
 }
 
+// ---- MILESTONE PANEL ----
+function updateMilestonePanel() {
+    const tillGold = 10 - (spawnCount % 10);
+    const tillDiamond = 100 - (spawnCount % 100);
+    const tillRainbow = 500 - (spawnCount % 500);
+    msGoldCount.textContent = tillGold === 10 ? 10 : tillGold;
+    msDiamondCount.textContent = tillDiamond === 100 ? 100 : tillDiamond;
+    msRainbowCount.textContent = tillRainbow === 500 ? 500 : tillRainbow;
+}
+
 // ---- GAME LOOP ----
 let lastTime = performance.now();
 let spawnTimer = 0;
@@ -387,6 +447,7 @@ function gameLoop(timestamp) {
     updateHUD();
     updateShop();
     updateCollection();
+    updateMilestonePanel();
 
     requestAnimationFrame(gameLoop);
 }
@@ -421,8 +482,9 @@ function saveGame() {
         money,
         luckLevel,
         padMultipliers,
-        discovered: [...discovered],
+        discovered: [...discovered], // [[index, count], ...]
         totalCollected,
+        spawnCount,
     };
     try {
         localStorage.setItem(getSaveKey(currentProfile), JSON.stringify(data));
@@ -438,8 +500,14 @@ function loadGame() {
         money = data.money || 0;
         luckLevel = data.luckLevel || 0;
         padMultipliers = data.padMultipliers || [1, 1, 1, 1, 1];
-        discovered = new Set(data.discovered || []);
+        const disc = data.discovered || [];
+        if (disc.length > 0 && Array.isArray(disc[0])) {
+            discovered = new Map(disc); // new format: [[index, count], ...]
+        } else {
+            discovered = new Map(disc.map(i => [i, 1])); // old format: [index, ...]
+        }
         totalCollected = data.totalCollected || 0;
+        spawnCount = data.spawnCount || 0;
 
         // Restore pad multiplier labels
         for (let i = 0; i < 5; i++) {
@@ -465,8 +533,9 @@ function resetState() {
     money = 0;
     luckLevel = 0;
     padMultipliers = [1, 1, 1, 1, 1];
-    discovered = new Set();
+    discovered = new Map();
     totalCollected = 0;
+    spawnCount = 0;
     clearActivePets();
     for (let i = 0; i < 5; i++) {
         const label = document.getElementById('mult-' + i);
